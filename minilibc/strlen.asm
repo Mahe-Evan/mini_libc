@@ -1,25 +1,22 @@
 BITS 64
 
 section .text
-global strlen
+    global strlen
 
 strlen:
-    push rbp
-    mov rbp, rsp
-    mov QWORD [rbp-0x18], rdi
-    mov DWORD [rbp-0x4], 0x0
-    jmp .loop
+    ENTER 0, 0  ;enter the fonction
+    xor rax, rax    ;set rax to 0
+    jmp .loop   ;got to loop
+
 .inc:
-    add DWORD [rbp-0x4], 0x1
-.loop:
-    mov eax, DWORD [rbp-0x4]
-    movsxd rdx, eax
-    mov rax, QWORD [rbp-0x18]
-    add rax, rdx
-    movzx eax, BYTE [rax]
-    test al, al
-    jnz .inc
-    mov eax, DWORD [rbp-0x4]
-    cdqe
-    pop rbp
+    inc rax ;inc rax 
+
+.loop:  ;loop
+    movzx rdx, byte [rdi + rax] ; The movzx (move with zero extension) instruction loads the byte from memory into the rdx register and zero-extends it to fill the entire 64-bit register
+    test rdx, rdx ;test if rdx is zero with a end
+    jz .done ;jump to done if zero
+    jmp .inc ;jump to inc
+
+.done:
+    LEAVE ;leave and return
     ret
