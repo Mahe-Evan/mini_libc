@@ -12,7 +12,8 @@ FOLDER	=	./minilibc/
 SRC	=	$(FOLDER)strlen.asm	\
 		$(FOLDER)strchr.asm	\
 		$(FOLDER)strrchr.asm	\
-		$(FOLDER)memset.asm
+		$(FOLDER)memset.asm	\
+		$(FOLDER)memcpy.asm
 
 OBJ	=	$(SRC:.asm=.o)
 
