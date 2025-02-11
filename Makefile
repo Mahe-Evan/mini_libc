@@ -9,7 +9,10 @@ NAME	=	libasm.so
 
 FOLDER	=	./minilibc/
 
-SRC	=	$(FOLDER)strlen.asm
+SRC	=	$(FOLDER)strlen.asm	\
+		$(FOLDER)strchr.asm	\
+		$(FOLDER)strrchr.asm	\
+		$(FOLDER)memset.asm
 
 OBJ	=	$(SRC:.asm=.o)
 
