@@ -35,6 +35,6 @@ clean:
 	rm -f $(OBJ) main.o test
 
 fclean: clean
-	rm libasm.so
+	rm -f $(NAME)
 
 re: clean all
