@@ -14,7 +14,7 @@ memset:
 .loop:
     cmp rcx, rdx ;comp rdx and rcx
     je .done ;if eq, done
-    mov BYTE [rdi+rcx], al ;store al in the BYTE (al is the char to put in)
+    mov BYTE [rdi+rcx], sil ;store sil in the BYTE (sil is the char to put in) (sil is the low part of rsi)
     jmp .inc ;jump inc
 
 .done:
