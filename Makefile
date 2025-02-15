@@ -13,7 +13,8 @@ SRC	=	$(FOLDER)strlen.asm	\
 		$(FOLDER)strchr.asm	\
 		$(FOLDER)strrchr.asm	\
 		$(FOLDER)memset.asm	\
-		$(FOLDER)memcpy.asm
+		$(FOLDER)memcpy.asm	\
+		$(FOLDER)strcmp.asm	\
 
 OBJ	=	$(SRC:.asm=.o)
 
@@ -26,7 +27,7 @@ LDFLAGS = -shared -o
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) -nostdlib -shared -o $(NAME) -fPIC $(OBJ)
+	$(CC) -shared -o $(NAME) -fPIC $(OBJ)
 
 %.o: %.asm
 	$(NASM) $(NASMFLAGS) -o $@ $<
@@ -36,5 +37,10 @@ clean:
 
 fclean: clean
 	rm -f $(NAME)
+
+# main: $(NAME)
+# 	export LD_LIBRARY_PATH=$(shell pwd)
+# 	gcc -no-pie tmain.c -L. -lasm -fno-builtin -o testmain
+# 	LD_LIBRARY_PATH=$(shell pwd)/ LD_PRELOAD=$(shell pwd)/$(NAME) ./testmain
 
 re: clean all
