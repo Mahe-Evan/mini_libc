@@ -28,7 +28,7 @@ LDFLAGS = -shared -o
 all: $(NAME)
 
 $(NAME): $(OBJ)
-	$(CC) -shared -o $(NAME) -fPIC $(OBJ)
+	ld $(LDFLAGS) $(NAME) $(OBJ)
 
 %.o: %.asm
 	$(NASM) $(NASMFLAGS) -o $@ $<
