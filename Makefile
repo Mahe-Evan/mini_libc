@@ -17,6 +17,7 @@ SRC	=	$(FOLDER)strlen.asm	\
 		$(FOLDER)strcmp.asm	\
 		$(FOLDER)strncmp.asm	\
 		$(FOLDER)memmove.asm	\
+		$(FOLDER)strcasecmp.asm	\
 
 OBJ	=	$(SRC:.asm=.o)
 
