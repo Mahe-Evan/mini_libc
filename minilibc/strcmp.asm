@@ -21,6 +21,8 @@ strcmp:
     jmp .inc ; jump to inc
 
 .done:
+    movzx rax, al ; zero-extend al to rax
+    movzx rdx, dl ; zero-extend dl to rdx
     sub rax, rdx ; subtract dl from al to get the result
     LEAVE ; leave and return
     ret
