@@ -44,9 +44,9 @@ clean:
 fclean: clean
 	rm -f $(NAME)
 
-main: $(NAME)
-	export LD_LIBRARY_PATH=$(shell pwd)
-	gcc -no-pie tests/tmain.c -L. -lasm -fno-builtin -o testmain
-	LD_LIBRARY_PATH=$(shell pwd)/ LD_PRELOAD=$(shell pwd)/$(NAME) ./testmain
+# main: $(NAME)
+# 	export LD_LIBRARY_PATH=$(shell pwd)
+# 	gcc -no-pie tests/tmain.c -L. -lasm -fno-builtin -o testmain
+# 	LD_LIBRARY_PATH=$(shell pwd)/ LD_PRELOAD=$(shell pwd)/$(NAME) ./testmain
 
 re: clean all
