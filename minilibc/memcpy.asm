@@ -5,23 +5,25 @@ global memcpy
 
 memcpy:
     ENTER 0, 0
-    mov rcx, rdx ; set counter with rdx arg
-    mov rax, rdi ; save the dest in the return arg
-    jmp .loop ; jump loop
+    mov rax, rdi ; Save original destination pointer
+    cmp rdx, 0 ; If size (rdx) is zero, return immediately
+    je .done
+    mov rcx, rdx ; Copy `n` (rdx) into rcx for loop counter
+    jmp .loop ; Jump to loop
 
-.ops:
-    inc rsi ; Increment source pointer
-    inc rdi ; Increment destination pointer
-    dec rcx ; Decrement counter
+.inc:
+    inc rsi  ; Increment source pointer
+    inc rdi  ; Increment destination pointer
+    dec rcx  ; Decrement counter
+    jmp .loop ; Jump to loop
 
 .loop:
-    test rcx, rcx ; Check if rcx is 0
-    jz .done ; If zero, jump to done
-    mov al, [rsi] ;move the char of src in al
-    mov [rdi], al ;move the char al in the dest
-    jmp .ops ;jump ops
+    test rcx, rcx ; Check if all bytes are copied
+    jz .done
+    mov dl, [rsi] ; Load byte from source
+    mov [rdi], dl ; Store byte into destination
+    jmp .inc ;jump to inc
 
 .done:
-    mov rax, rdi ; set rdi to rax for return
     LEAVE
     ret

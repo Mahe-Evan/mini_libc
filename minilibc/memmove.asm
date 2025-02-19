@@ -5,45 +5,52 @@ global memmove
 
 memmove:
     ENTER 0, 0
-    cmp rdx, 0 ; check if rdx is 0
-    jz .done ; if zero, jump to done
-    mov rcx, rdx ; set counter with rdx arg
-    mov rax, rdi ; save the dest in the return arg
-    cmp rsi, rdi ; compare src and dest
-    jae .forward ; if src is greater or equal to dest, jump to forward
-    jmp .loop ; jump loop
-
-.ops:
-    inc rsi ; Increment source pointer
-    inc rdi ; Increment destination pointer
-    dec rcx ; Decrement counter
-
-.loop:
-    test rcx, rcx ; Check if rcx is 0
-    jz .done ; If zero, jump to done
-    mov al, [rsi] ;move the char of src in al
-    mov [rdi], al ;move the char al in the dest
-    jmp .ops ;jump ops
-
-.fops:
-    dec rsi ; Decrement source pointer
-    dec rdi ; Decrement destination pointer
-    dec rcx ; Decrement counter
-
-.floop:
-    test rcx, rcx ; Check if rcx is 0
-    jz .done ; If zero, jump to done
-    mov al, [rsi] ;move the char of src in al
-    mov [rdi], al ;move the char al in the dest
-    jmp .fops ;jump fops
+    mov rax, rdi ; Save original destination pointer
+    cmp byte [rdi], 0 ; Segfault if destination is null
+    cmp byte [rsi], 0 ; Segfault if source is null
+    cmp rsi, rdi ; Compare source and destination pointers
+    je .done ; If they are the same, nothing to do
+    jae .forward ; If source is after destination, copy forward
+    jmp .backward ; Otherwise, copy backward
 
 .forward:
-    add rsi, rcx ; Move source pointer to the end
-    add rdi, rcx ; Move destination pointer to the end
+    mov rcx, rdx ; Copy `n` (rdx) into rcx for loop counter
+    jmp .floop
+
+.finc:
+    inc rsi  ; Increment source pointer
+    inc rdi  ; Increment destination pointer
+    dec rcx  ; Decrement counter
     jmp .floop ; Jump to loop
 
+.floop:
+    test rcx, rcx ; Check if all bytes are copied
+    jz .done
+    mov dl, [rsi] ; Load byte from source
+    mov [rdi], dl ; Store byte into destination
+    jmp .finc ; Jump to inc
+
+.backward:
+    add rsi, rdx ; Move source pointer to the end
+    add rdi, rdx ; Move destination pointer to the end
+    mov rcx, rdx ; Copy `n` (rdx) into rcx for loop counter
+    dec rsi  ; Decrement source pointer
+    dec rdi  ; Decrement destination pointer
+    jmp .bloop
+
+.bdec:
+    dec rsi  ; Decrement source pointer
+    dec rdi  ; Decrement destination pointer
+    dec rcx  ; Decrement counter
+    jmp .bloop ; Jump to loop
+
+.bloop:
+    test rcx, rcx ; Check if all bytes are copied
+    jz .done
+    mov dl, [rsi] ; Load byte from source
+    mov [rdi], dl ; Store byte into destination
+    jmp .bdec ; Jump to dec
 
 .done:
-    mov rax, rdi ; set rdi to rax for return
     LEAVE
     ret

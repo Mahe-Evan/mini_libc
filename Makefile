@@ -38,12 +38,6 @@ $(NAME): $(OBJ)
 %.o: %.asm
 	$(NASM) $(NASMFLAGS) -o $@ $<
 
-clean:
-	rm -f $(OBJ) main.o test
-
-fclean: clean
-	rm -f $(NAME)
-
 main: $(NAME)
 	export LD_LIBRARY_PATH=$(shell pwd)
 	gcc -no-pie tmain.c -L. -lasm -fno-builtin -o testmain
@@ -51,6 +45,8 @@ main: $(NAME)
 
 clean:
 	rm -f $(OBJ) main.o test
+	rm -f *.gcda
+	rm -f *.gcno
 
 fclean: clean
 	rm -f $(NAME)
@@ -61,18 +57,23 @@ TEST_DIR = tests
 
 FLAGS_TEST = --coverage -lcriterion
 
+TEST_DIR = tests
+
+FLAGS_TEST = --coverage -lcriterion
+
 SRC_TESTS = \
 	$(TEST_DIR)/strlen.c	\
 	$(TEST_DIR)/strchr.c	\
 	$(TEST_DIR)/strrchr.c	\
 	$(TEST_DIR)/memset.c	\
-	#$(TEST_DIR)/strcmp.c	\
 	$(TEST_DIR)/memcpy.c	\
+	$(TEST_DIR)/strcmp.c	\
 	$(TEST_DIR)/memmove.c	\
 	$(TEST_DIR)/strncmp.c	\
 	$(TEST_DIR)/strcasecmp.c	\
 	$(TEST_DIR)/strpbrk.c	\
 	$(TEST_DIR)/strcspn.c	\
+	$(TEST_DIR)/strstr.c	\
 
 unit_tests: re
 	$(CC) -o $(NAME_TEST) $(SRC_TESTS) $(CFLAGS) $(FLAGS_TEST)
@@ -80,6 +81,5 @@ unit_tests: re
 tests_run: $(NAME_TEST)
 	rm -f *.gc*
 	./$(NAME_TEST)
-re: clean all
 
-re: clean all
+re: fclean clean all

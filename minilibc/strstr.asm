@@ -5,8 +5,19 @@ global strstr
 
 strstr:
     ENTER 0, 0
+
     xor rcx, rcx ;set rcx to 0
-    jmp .loop ;jump to loop
+    jmp .check_first_string_zero
+
+.check_first_string_zero:
+    cmp BYTE [rdi+rcx], 0 ; Check if first string is null
+    jz .check_second_string_zero ; If null, return null
+    jnz .loop ; If not null, jump to loop
+
+.check_second_string_zero:
+    cmp BYTE [rsi], 0 ; Check if second string is null
+    jz .setnonnull ; If null, return first string
+    jnz .loop ; If not null, jump to loop
 
 .inc:
     inc rcx ;increment rcx

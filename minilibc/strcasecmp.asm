@@ -17,9 +17,9 @@ strcasecmp:
 
 .to_lower_dl:
     cmp dl, 'A'
-    jl .done ; If dl < 'A', return
+    jl .compare ; If dl < 'A', compare
     cmp dl, 'Z'
-    jg .done ; If dl > 'Z', return
+    jg .compare ; If dl > 'Z', compare
     add dl, 32 ; Convert dl to lowercase
     jmp .compare
 
