@@ -9,6 +9,7 @@
 #include <criterion/redirect.h>
 #include <dlfcn.h>
 #include <stddef.h>
+#include <signal.h>
 
 typedef size_t (*strlen_func_t)(const char *);
 
@@ -29,111 +30,123 @@ static void teardown(void)
     dlclose(handle);
 }
 
+static void test(const char *string)
+{
+    int actual = my_strlen(string);
+    int expected = strlen(string);
+
+    cr_assert_eq(actual, expected, "strlen(\"%s\"): Expected: %d, but got: %d",
+        string, expected, actual);
+}
+
 TestSuite(strlen, .init = setup, .fini = teardown);
 
 Test(strlen, normal)
 {
-    cr_assert_eq(my_strlen("Hello World!"), strlen("Hello World!"));
+    test("Hello World!");
 }
 
 Test(strlen, empty)
 {
-    cr_assert_eq(my_strlen(""), strlen(""));
+    test("");
 }
-
 Test(strlen, single_character)
 {
-    cr_assert_eq(my_strlen("A"), strlen("A"));
+    test("A");
 }
 
 Test(strlen, whitespace)
 {
-    cr_assert_eq(my_strlen(" "), strlen(" "));
+    test(" ");
 }
 
 Test(strlen, multiple_spaces)
 {
-    cr_assert_eq(my_strlen("     "), strlen("     "));
+    test("     ");
 }
 
 Test(strlen, special_characters)
 {
-    cr_assert_eq(my_strlen("!@#$%^&*()"), strlen("!@#$%^&*()"));
+    test("!@#$%^&*()");
 }
 
 Test(strlen, numeric_characters)
 {
-    cr_assert_eq(my_strlen("1234567890"), strlen("1234567890"));
+    test("1234567890");
 }
 
 Test(strlen, alphanumeric)
 {
-    cr_assert_eq(my_strlen("abc123"), strlen("abc123"));
+    test("abc123");
 }
 
 Test(strlen, mixed_case)
 {
-    cr_assert_eq(my_strlen("AbCdEfGh"), strlen("AbCdEfGh"));
+    test("AbCdEfGh");
 }
 
 Test(strlen, long_string)
 {
-    cr_assert_eq(
-        my_strlen("This is a very long string used for testing purposes."),
-        strlen("This is a very long string used for testing purposes."));
+    test("This is a very long string used for testing purposes.");
 }
 
 Test(strlen, unicode_characters)
 {
-    cr_assert_eq(my_strlen("こんにちは"),
-        strlen("こんにちは"));  // Assuming strlen counts bytes, not characters
+    test("こんにちは"); // Assuming strlen counts bytes, not characters
 }
+
 Test(strlen, repeated_characters)
 {
-    cr_assert_eq(my_strlen("aaaaaaaaaa"), strlen("aaaaaaaaaa"));
+    test("aaaaaaaaaa");
 }
 
 Test(strlen, escape_sequences)
 {
-    cr_assert_eq(my_strlen("\n\t\r"), strlen("\n\t\r"));
+    test("\n\t\r");
 }
 
 Test(strlen, mixed_content)
 {
-    cr_assert_eq(my_strlen("abc123!@#"), strlen("abc123!@#"));
+    test("abc123!@#");
 }
 
 Test(strlen, string_with_newline)
 {
-    cr_assert_eq(my_strlen("Hello\nWorld"), strlen("Hello\nWorld"));
+    test("Hello\nWorld");
 }
 
 Test(strlen, string_with_tab)
 {
-    cr_assert_eq(my_strlen("Hello\tWorld"), strlen("Hello\tWorld"));
+    test("Hello\tWorld");
 }
 
 Test(strlen, string_with_carriage_return)
 {
-    cr_assert_eq(my_strlen("Hello\rWorld"), strlen("Hello\rWorld"));
+    test("Hello\rWorld");
 }
 
 Test(strlen, string_with_backslash)
 {
-    cr_assert_eq(my_strlen("Hello\\World"), strlen("Hello\\World"));
+    test("Hello\\World");
 }
 
 Test(strlen, string_with_quotes)
 {
-    cr_assert_eq(my_strlen("\"Hello World\""), strlen("\"Hello World\""));
+    test("\"Hello World\"");
 }
 
 Test(strlen, string_with_single_quote)
 {
-    cr_assert_eq(my_strlen("'Hello World'"), strlen("'Hello World'"));
+    test("'Hello World'");
 }
 
 Test(strlen, string_with_mixed_whitespace)
 {
-    cr_assert_eq(my_strlen(" \t\n\r"), strlen(" \t\n\r"));
+    test(" \t\n\r");
+}
+
+Test(strlen, null_pointer, .signal = SIGSEGV)
+{
+    my_strlen(NULL);
+    cr_assert_fail("A segmentation fault should have been raised");
 }

@@ -1,8 +1,8 @@
 /*
 ** EPITECH PROJECT, 2025
-** ut
+** MiniLibC
 ** File description:
-** ut
+** Unit Tests for strcmp
 */
 
 #include <criterion/criterion.h>
@@ -10,62 +10,148 @@
 #include <dlfcn.h>
 #include <stddef.h>
 #include <signal.h>
-#include <string.h>
 
 typedef int (*strcmp_func_t)(const char *, const char *);
 
-static void *handle = NULL;
-static int (*my_strcmp)(const char *, const char *) = 0;
+static strcmp_func_t my_strcmp;
+static void *handle;
 
 static void setup(void)
 {
     handle = dlopen("./libasm.so", RTLD_LAZY);
-    cr_assert_not_null(handle, "Failed to open library");
-    my_strcmp = dlsym(handle, "strcmp");
-    cr_assert_not_null(my_strcmp, "Failed to find strcmp symbol");
+    cr_assert_not_null(handle, "Failed to open libasm.so: %s", dlerror());
+    my_strcmp = (strcmp_func_t)dlsym(handle, "strcmp");
+    cr_assert_not_null(
+        my_strcmp, "Failed to find symbol 'strcmp': %s", dlerror());
 }
 
 static void teardown(void)
 {
-    if (handle)
-        dlclose(handle);
+    dlclose(handle);
 }
 
-Test(strcmp, test_found, .init = setup, .fini = teardown)
+static void test(const char *s1, const char *s2)
 {
-    int result_my_strcmp = my_strcmp("Hello, World!", "W");
-    int result_strcmp = strcmp("Hello, World!", "W");
-    printf("my_strcmp result: %d\n", result_my_strcmp);
-    printf("strcmp result: %d\n", result_strcmp);
-    cr_assert_eq(result_my_strcmp, result_strcmp);
+    int actual = my_strcmp(s1, s2);
+    int expected = strcmp(s1, s2);
+
+    cr_assert_eq(actual, expected, "strcmp(\"%s\", \"%s\"): Expected: %d, but got: %d",
+        s1, s2, expected, actual);
 }
 
-// Test(strcmp, test_not_found, .init = setup, .fini = teardown)
-// {
-//     cr_assert_eq(my_strcmp("Hello, World!", "x"), strcmp("Hello, World!", "x"));
-// }
+TestSuite(strcmp, .init = setup, .fini = teardown);
 
-// Test(strcmp, test_first_char, .init = setup, .fini = teardown)
-// {
-//     cr_assert_eq(my_strcmp("Hello, World!", "H"), strcmp("Hello, World!", "H"));
-// }
+Test(strcmp, no_diff)
+{
+    test("Hello World!", "Hello World!");
+}
 
-// Test(strcmp, test_last_char, .init = setup, .fini = teardown)
-// {
-//     cr_assert_eq(my_strcmp("Hello, World!", "!"), strcmp("Hello, World!", "!"));
-// }
+Test(strcmp, diff_length)
+{
+    test("Hello", "Hello World!");
+}
 
-// Test(strcmp, test_null_terminator, .init = setup, .fini = teardown)
-// {
-//     cr_assert_eq(my_strcmp("Hello, World!", "\0"), strcmp("Hello, World!", "\0"));
-// }
+Test(strcmp, diff_content)
+{
+    test("Hello", "Hella");
+}
 
-// Test(strcmp, test_empty_string, .init = setup, .fini = teardown)
-// {
-//     cr_assert_eq(my_strcmp("", "a"), strcmp("", "a"));
-// }
+Test(strcmp, empty_strings)
+{
+    test("", "");
+}
 
-// Test(strcmp, backslash_zero, .init = setup, .fini = teardown)
-// {
-//     cr_assert_eq(my_strcmp("\0", "\0"), strcmp("\0", "\0"));
-// }
+Test(strcmp, first_empty)
+{
+    test("", "Hello");
+}
+
+Test(strcmp, second_empty)
+{
+    test("Hello", "");
+}
+
+Test(strcmp, case_sensitive)
+{
+    test("hello", "Hello");
+}
+
+Test(strcmp, special_characters)
+{
+    test("Hello\n", "Hello\t");
+}
+
+Test(strcmp, numeric_strings)
+{
+    test("12345", "12345");
+}
+
+Test(strcmp, numeric_diff)
+{
+    test("12345", "12346");
+}
+
+Test(strcmp, whitespace_diff)
+{
+    test("Hello ", "Hello");
+}
+
+Test(strcmp, leading_whitespace)
+{
+    test(" Hello", "Hello");
+}
+
+Test(strcmp, trailing_whitespace)
+{
+    test("Hello", "Hello ");
+}
+
+Test(strcmp, mixed_case)
+{
+    test("Hello", "hello");
+}
+
+Test(strcmp, special_characters_diff)
+{
+    test("Hello!", "Hello?");
+}
+
+Test(strcmp, long_strings)
+{
+    test("This is a very long string used for testing purposes.",
+         "This is a very long string used for testing purposes.");
+}
+
+Test(strcmp, long_strings_diff)
+{
+    test("This is a very long string used for testing purposes.",
+         "This is a very long string used for testing purpose.");
+}
+
+Test(strcmp, unicode_strings)
+{
+    test("こんにちは", "こんにちは");
+}
+
+Test(strcmp, unicode_diff)
+{
+    test("こんにちは", "こんばんは");
+}
+
+Test(strcmp, test_null_first_string, .signal = SIGSEGV)
+{
+    my_strcmp(NULL, "hello");
+    cr_assert_fail("A segmentation fault should have been raised");
+}
+
+Test(strcmp, test_null_second_string, .signal = SIGSEGV)
+{
+    my_strcmp("hello", NULL);
+    cr_assert_fail("A segmentation fault should have been raised");
+}
+
+Test(strcmp, test_both_null_strings, .signal = SIGSEGV)
+{
+    my_strcmp(NULL, NULL);
+    cr_assert_fail("A segmentation fault should have been raised");
+}
