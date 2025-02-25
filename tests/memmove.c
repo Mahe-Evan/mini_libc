@@ -90,20 +90,18 @@ Test(memmove, test_compare_with_real_memmove)
     cr_assert_str_eq(dest1, dest2, "Expected '%s' but got '%s'", dest1, dest2);
 }
 
-Test(memmove, test_null_first_string, .signal = SIGSEGV)
+Test(memmove, test_null_first_string)
 {
-    my_memmove(NULL, "hello", 5);
-    cr_assert_fail("A segmentation fault should have been raised");
+    cr_assert_eq(my_memmove(NULL, "hello", 5), NULL);
 }
 
-Test(memmove, test_null_second_string, .signal = SIGSEGV)
+Test(memmove, test_null_second_string)
 {
-    my_memmove("hello", NULL, 5);
-    cr_assert_fail("A segmentation fault should have been raised");
+    cr_assert_eq(my_memmove("hello", NULL, 5), NULL);
 }
 
-Test(memmove, test_both_null_strings, .signal = SIGSEGV)
+Test(memmove, test_both_null_strings)
 {
     my_memmove(NULL, NULL, 5);
-    cr_assert_fail("A segmentation fault should have been raised");
+    cr_assert_eq(my_memmove(NULL, NULL, 5), NULL);
 }
