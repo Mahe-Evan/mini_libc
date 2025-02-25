@@ -6,8 +6,10 @@ global memmove
 memmove:
     ENTER 0, 0
     mov rax, rdi ; Save original destination pointer
-    cmp byte [rdi], 0 ; Segfault if destination is null
-    cmp byte [rsi], 0 ; Segfault if source is null
+    cmp rdi, 0 ; Check if destination is null
+    je .return_null ; Return null if destination is null
+    cmp rsi, 0 ; Check if source is null
+    je .return_null ; Return null if source is null
     cmp rsi, rdi ; Compare source and destination pointers
     je .done ; If they are the same, nothing to do
     jae .forward ; If source is after destination, copy forward
@@ -50,6 +52,9 @@ memmove:
     mov dl, [rsi] ; Load byte from source
     mov [rdi], dl ; Store byte into destination
     jmp .bdec ; Jump to dec
+
+.return_null:
+    xor rax, rax ; Set rax to 0
 
 .done:
     LEAVE
