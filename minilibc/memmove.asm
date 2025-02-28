@@ -9,7 +9,7 @@ memmove:
     cmp rdi, 0 ; Check if destination is null
     je .return_null ; Return null if destination is null
     cmp rsi, 0 ; Check if source is null
-    je .return_null ; Return null if source is null
+    je .done ; return the dest if src is null
     cmp rsi, rdi ; Compare source and destination pointers
     je .done ; If they are the same, nothing to do
     jae .forward ; If source is after destination, copy forward
