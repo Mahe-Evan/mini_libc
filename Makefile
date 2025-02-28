@@ -21,6 +21,8 @@ SRC	=	$(FOLDER)strlen.asm	\
 		$(FOLDER)strstr.asm	\
 		$(FOLDER)strpbrk.asm	\
 		$(FOLDER)strcspn.asm	\
+		$(FOLDER)index.asm	\
+		$(FOLDER)rindex.asm	\
 
 OBJ	=	$(SRC:.asm=.o)
 
@@ -74,6 +76,8 @@ SRC_TESTS = \
 	$(TEST_DIR)/strpbrk.c	\
 	$(TEST_DIR)/strcspn.c	\
 	$(TEST_DIR)/strstr.c	\
+	$(TEST_DIR)/index.c	\
+	$(TEST_DIR)/rindex.c	\
 
 unit_tests: re
 	$(CC) -o $(NAME_TEST) $(SRC_TESTS) $(CFLAGS) $(FLAGS_TEST)
